@@ -4,6 +4,9 @@ import sys
 import re
 
 def parse(r):
+  m = re.match(r'^#.*$', r)
+  if m:
+    return None
   m = re.match(r'^([0-9])-([0-9])([1-9][0-9]*)/([1-9][0-9]*)$', r)
   if m:
     return (int(m.group(1)), int(m.group(2)), float(m.group(4)) / float(m.group(3)))
@@ -32,12 +35,14 @@ def estimate(c, cs):
   return (e, c[0], c[1])
 
 cs = [parse(l.strip()) for l in sys.stdin if len(l.strip())]
+cs = [c for c in cs if c is not None]
 norm = sum(c[2] for c in cs)
+print 'Norm:', norm
 cs = [(s1, s2, c / norm) for s1, s2, c in cs]
 print cs
-print "1: ", sum(c[2] for c in cs if c[0] > c[1])
-print "D: ", sum(c[2] for c in cs if c[0] == c[1])
-print "2: ", sum(c[2] for c in cs if c[0] < c[1])
+print "1:", sum(c[2] for c in cs if c[0] > c[1])
+print "D:", sum(c[2] for c in cs if c[0] == c[1])
+print "2:", sum(c[2] for c in cs if c[0] < c[1])
 
 es = sorted([estimate(c, cs) for c in cs], reverse=True)
 
